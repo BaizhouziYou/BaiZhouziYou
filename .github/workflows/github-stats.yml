@@ -1,0 +1,23 @@
+name: Update GitHub Stats
+
+on:
+  schedule:
+  #UTC+8=07:00
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate-stats:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Generate GitHub statistics
+        uses: cicirello/user-statistician@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
