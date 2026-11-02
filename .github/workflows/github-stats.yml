@@ -2,7 +2,7 @@ name: Update GitHub Profile Cards
 
 on:
   schedule:
-    # 07:00 (UTC+8); GitHub Actions cron uses UTC.
+    # 07:00 (UTC+8); GitHub Actions cron is in UTC.
     - cron: '0 23 * * *'
   workflow_dispatch:
 
@@ -16,52 +16,90 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Check out profile repository
         uses: actions/checkout@v4
-
-      - name: Generate light cards
-        uses: vn7n24fzkq/github-profile-summary-cards@v0.12.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
         with:
-          USERNAME: BaizhouziYou
-          THEME: github
-          UTC_OFFSET: 8
-          AUTO_PUSH: false
+          persist-credentials: true
 
-      - name: Preserve light cards
-        run: |
-          test -s profile-summary-card-output/github/3-stats.svg
-          mkdir -p "$RUNNER_TEMP/profile-cards"
-          cp -a profile-summary-card-output/github "$RUNNER_TEMP/profile-cards/"
-
-      - name: Generate dark cards
-        uses: vn7n24fzkq/github-profile-summary-cards@v0.12.0
+      - name: Check GitHub data token
         env:
-          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          PROFILE_STATS_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+        run: |
+          if [ -z "$PROFILE_STATS_TOKEN" ]; then
+            echo '::error::Missing SUMMARY_GITHUB_TOKEN repository secret.'
+            exit 1
+          fi
+
+      # Generate locally stored SVGs (not public web-service URLs).
+      - name: Generate stats card (light)
+        uses: stats-organization/github-readme-stats-action@v2
         with:
-          USERNAME: BaizhouziYou
-          THEME: github_dark
-          UTC_OFFSET: 8
-          AUTO_PUSH: false
+          card: stats
+          options: username=BaizhouziYou&theme=default&show_icons=true&hide_rank=true
+          path: profile-assets/stats-light.svg
+          token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          fail_on_error: true
 
-      - name: Restore light cards and validate output
-        run: |
-          test -s profile-summary-card-output/github_dark/3-stats.svg
-          cp -a "$RUNNER_TEMP/profile-cards/github" profile-summary-card-output/
-          for theme in github github_dark; do
-            for card in 0-profile-details 1-repos-per-language 2-most-commit-language 3-stats 4-productive-time; do
-              test -s "profile-summary-card-output/$theme/$card.svg" || { echo "Missing $theme/$card.svg"; exit 1; }
-            done
-          done
+      - name: Generate stats card (dark)
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: stats
+          options: username=BaizhouziYou&theme=github_dark&show_icons=true&hide_rank=true
+          path: profile-assets/stats-dark.svg
+          token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          fail_on_error: true
 
-      - name: Commit cards if changed
+      - name: Generate language card (light)
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=BaizhouziYou&theme=default&layout=normal&langs_count=5
+          path: profile-assets/langs-light.svg
+          token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Generate language card (dark)
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=BaizhouziYou&theme=github_dark&layout=normal&langs_count=5
+          path: profile-assets/langs-dark.svg
+          token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Generate contribution calendar (light + dark)
+        env:
+          PROFILE_STATS_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          PROFILE_STATS_USERNAME: BaizhouziYou
+        run: python3 scripts/generate_contributions.py
+
+      - name: Verify generated SVGs
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A profile-summary-card-output/github/ profile-summary-card-output/github_dark/
+          python3 - <<'PY'
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          names = ['stats-light', 'stats-dark', 'langs-light', 'langs-dark',
+                   'contributions-light', 'contributions-dark']
+          for name in names:
+              path = Path('profile-assets') / f'{name}.svg'
+              if not path.is_file() or path.stat().st_size < 100:
+                  raise SystemExit(f'Missing or empty SVG: {path}')
+              root = ET.parse(path).getroot()
+              if not root.tag.endswith('svg'):
+                  raise SystemExit(f'Invalid SVG: {path}')
+              print(f'OK: {path} ({path.stat().st_size} bytes)')
+          PY
+
+      - name: Commit updated SVGs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A profile-assets/*.svg
           if ! git diff --cached --quiet; then
-            git commit -m "chore: refresh GitHub profile cards [skip ci]"
+            git commit -m 'chore: refresh GitHub profile SVGs [skip ci]'
             git push
+          else
+            echo 'No SVG changes to commit.'
           fi
