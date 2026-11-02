@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a GitHub contribution calendar as two self-contained SVG files.
+"""Generate GitHub contribution calendar and activity overview SVG cards.
 
 Uses only Python's standard library and GitHub's GraphQL API.
 Requires PROFILE_STATS_TOKEN and optionally PROFILE_STATS_USERNAME.
@@ -32,10 +32,14 @@ LEVELS = {"NONE": 0, "FIRST_QUARTILE": 1, "SECOND_QUARTILE": 2,
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
-def get_calendar(username: str, token: str) -> dict:
+def get_contributions(username: str, token: str) -> dict:
     query = """query($login:String!) {
       user(login:$login) {
         contributionsCollection {
+          totalCommitContributions
+          totalIssueContributions
+          totalPullRequestContributions
+          totalPullRequestReviewContributions
           contributionCalendar {
             totalContributions
             weeks {
@@ -63,10 +67,15 @@ def get_calendar(username: str, token: str) -> dict:
     if body.get("errors"):
         messages = "; ".join(str(e.get("message", "unknown error")) for e in body["errors"])
         raise RuntimeError(f"GitHub GraphQL error: {messages}")
-    calendar = ((body.get("data") or {}).get("user") or {}).get("contributionsCollection", {}).get("contributionCalendar")
+    collection = ((body.get("data") or {}).get("user") or {}).get("contributionsCollection")
+    calendar = (collection or {}).get("contributionCalendar")
     if not calendar or not calendar.get("weeks"):
         raise RuntimeError("GitHub returned no contribution calendar data.")
-    return calendar
+    for key in ("totalCommitContributions", "totalIssueContributions",
+                "totalPullRequestContributions", "totalPullRequestReviewContributions"):
+        if key not in collection or collection[key] is None:
+            raise RuntimeError(f"GitHub returned no {key} metric")
+    return collection
 
 
 def svg_for(calendar: dict, theme: str) -> bytes:
@@ -125,17 +134,94 @@ def svg_for(calendar: dict, theme: str) -> bytes:
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
+def activity_svg(collection: dict, theme: str) -> bytes:
+    """Render the GitHub-style four-direction contribution overview with real data.
+
+    Percentages are shares of these four contribution types in the selected
+    GitHub contributionsCollection period, not arbitrary personal scores.
+    """
+    c = PALETTES[theme]
+    bg, fg, muted, border = [c[k] for k in ("bg", "fg", "muted", "border")]
+    accent = "#238636" if theme == "light" else "#3fb950"
+    axis = "#d8dee4" if theme == "light" else "#30363d"
+    counts = [int(collection[k]) for k in (
+        "totalCommitContributions", "totalPullRequestContributions",
+        "totalIssueContributions", "totalPullRequestReviewContributions")]
+    if any(n < 0 for n in counts):
+        raise ValueError("Contribution counts may not be negative")
+    total = sum(counts)
+    shares = [(v / total * 100) if total else 0 for v in counts]
+    commits, prs, issues, reviews = shares
+    cx, cy, radius = 585, 212, 110
+    # Directions: up = reviews, right = issues, down = PRs, left = commits.
+    points = [(cx, cy - radius * reviews / 100),
+              (cx + radius * issues / 100, cy),
+              (cx, cy + radius * prs / 100),
+              (cx - radius * commits / 100, cy)]
+    polygon = " ".join(f"{x:.2f},{y:.2f}" for x, y in points)
+    lines = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="860" height="404" viewBox="0 0 860 404" role="img" aria-labelledby="activity-title activity-desc">',
+        '<title id="activity-title">Activity overview</title>',
+        '<desc id="activity-desc">Share of commits, pull requests, issues, and code reviews over the past contribution year</desc>',
+        f'<rect x="0.5" y="0.5" width="859" height="403" rx="13" fill="{bg}" stroke="{border}"/>',
+        '<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif">',
+        f'<text x="24" y="38" font-size="22" font-weight="600" fill="{fg}">Activity overview</text>',
+        f'<text x="24" y="64" font-size="13" fill="{muted}">Breakdown of contribution types over the past year</text>',
+        f'<line x1="310" x2="310" y1="90" y2="365" stroke="{border}"/>',
+        f'<text x="24" y="118" font-size="16" font-weight="600" fill="{fg}">Contribution types</text>',
+    ]
+    labels = ["Commits", "Pull requests", "Issues", "Code reviews"]
+    for i, (label, count, share) in enumerate(zip(labels, counts, shares)):
+        yy = 155 + i * 52
+        lines.append(f'<circle cx="32" cy="{yy-5}" r="5" fill="{accent}"/>')
+        lines.append(f'<text x="49" y="{yy}" font-size="16" fill="{fg}">{label}</text>')
+        lines.append(f'<text x="282" y="{yy}" font-size="16" font-weight="600" text-anchor="end" fill="{accent}">{count:,}</text>')
+        lines.append(f'<text x="49" y="{yy+18}" font-size="12" fill="{muted}">{share:.0f}% of tracked activity</text>')
+
+    # Faint cross with tick marks, then a filled contribution-share silhouette.
+    lines.extend([
+        f'<line x1="{cx-radius}" y1="{cy}" x2="{cx+radius}" y2="{cy}" stroke="{axis}" stroke-width="2"/>',
+        f'<line x1="{cx}" y1="{cy-radius}" x2="{cx}" y2="{cy+radius}" stroke="{axis}" stroke-width="2"/>',
+    ])
+    for fraction in (0.25, 0.50, 0.75, 1.00):
+        t = radius * fraction
+        for x, y in [(cx-t,cy), (cx+t,cy), (cx,cy-t), (cx,cy+t)]:
+            if x == cx:
+                lines.append(f'<line x1="{x-4:.1f}" x2="{x+4:.1f}" y1="{y:.1f}" y2="{y:.1f}" stroke="{axis}"/>')
+            else:
+                lines.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{y-4:.1f}" y2="{y+4:.1f}" stroke="{axis}"/>')
+    lines.append(f'<polygon points="{polygon}" fill="{accent}" fill-opacity="0.14" stroke="{accent}" stroke-opacity="0.7" stroke-width="1.5"/>')
+    for x, y in points:
+        lines.append(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="{accent}" stroke-width="5" stroke-linecap="round"/>')
+        lines.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{accent}"/>')
+    lines.append(f'<circle cx="{cx}" cy="{cy}" r="4" fill="{accent}"/>')
+    # Labels are outside the axis so even a 100% value does not overlap them.
+    for x,y,text,anchor in [
+        (cx,77,f"{reviews:.0f}% Code reviews","middle"),
+        (cx,365,f"{prs:.0f}% Pull requests","middle"),
+        (454,cy+5,f"{commits:.0f}% Commits","end"),
+        (715,cy+5,f"{issues:.0f}% Issues","start"),
+    ]:
+        lines.append(f'<text x="{x}" y="{y}" font-size="14" text-anchor="{anchor}" fill="{muted}">{text}</text>')
+    lines.append(f'<text x="24" y="381" font-size="12" fill="{muted}">Percentages are based on these four tracked contribution types.</text>')
+    lines.extend(['</g>', '</svg>'])
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def main():
     token = os.environ.get("PROFILE_STATS_TOKEN", "").strip()
     username = os.environ.get("PROFILE_STATS_USERNAME", "BaizhouziYou").strip()
     if not token:
         raise SystemExit("PROFILE_STATS_TOKEN is missing; set the SUMMARY_GITHUB_TOKEN repository secret.")
-    calendar = get_calendar(username, token)
+    collection = get_contributions(username, token)
     # Render everything in memory before touching output files.
-    images = {name: svg_for(calendar, name) for name in PALETTES}
+    images = {}
+    for theme in PALETTES:
+        images[f"contributions-{theme}"] = svg_for(collection["contributionCalendar"], theme)
+        images[f"activity-{theme}"] = activity_svg(collection, theme)
     DEST.mkdir(parents=True, exist_ok=True)
-    for theme, data in images.items():
-        path = DEST / f"contributions-{theme}.svg"
+    for name, data in images.items():
+        path = DEST / f"{name}.svg"
         tmp = path.with_suffix(".svg.tmp")
         tmp.write_bytes(data)
         tmp.replace(path)
