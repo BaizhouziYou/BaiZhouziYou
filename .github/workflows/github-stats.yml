@@ -1,23 +1,51 @@
-name: Update GitHub Stats
+name: Update GitHub Profile Cards
 
 on:
   schedule:
-  #UTC+8=07:00
-    - cron: "0 23 * * *"
+    # 07:00 (UTC+8); GitHub Actions uses UTC for cron.
+    - cron: '0 23 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: github-profile-cards
+  cancel-in-progress: false
+
 jobs:
-  generate-stats:
+  generate:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+      - name: Check out the profile repository
+        uses: actions/checkout@v4
 
-      - name: Generate GitHub statistics
-        uses: cicirello/user-statistician@v1
+      - name: Generate light cards
+        uses: vn7n24fzkq/github-profile-summary-cards@v0.12.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+        with:
+          USERNAME: BaizhouziYou
+          THEME: github
+          UTC_OFFSET: 8
+          AUTO_PUSH: false
+
+      - name: Generate dark cards
+        uses: vn7n24fzkq/github-profile-summary-cards@v0.12.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+        with:
+          USERNAME: BaizhouziYou
+          THEME: github_dark
+          UTC_OFFSET: 8
+          AUTO_PUSH: false
+
+      - name: Commit cards if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile-summary-card-output/github/ profile-summary-card-output/github_dark/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: refresh GitHub profile cards [skip ci]"
+            git push
+          fi
