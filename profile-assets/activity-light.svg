@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="404" viewBox="0 0 860 404" role="img" aria-labelledby="activity-title activity-desc">
+<title id="activity-title">Activity overview</title>
+<desc id="activity-desc">Share of commits, pull requests, issues, and code reviews over the past contribution year</desc>
+<rect x="0.5" y="0.5" width="859" height="403" rx="13" fill="#ffffff" stroke="#d0d7de"/>
+<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif">
+<text x="24" y="38" font-size="22" font-weight="600" fill="#24292f">Activity overview</text>
+<text x="24" y="64" font-size="13" fill="#57606a">Breakdown of contribution types over the past year</text>
+<line x1="310" x2="310" y1="90" y2="365" stroke="#d0d7de"/>
+<text x="24" y="118" font-size="16" font-weight="600" fill="#24292f">Contribution types</text>
+<circle cx="32" cy="150" r="5" fill="#238636"/>
+<text x="49" y="155" font-size="16" fill="#24292f">Commits</text>
+<text x="282" y="155" font-size="16" font-weight="600" text-anchor="end" fill="#238636">83</text>
+<text x="49" y="173" font-size="12" fill="#57606a">72% of tracked activity</text>
+<circle cx="32" cy="202" r="5" fill="#238636"/>
+<text x="49" y="207" font-size="16" fill="#24292f">Pull requests</text>
+<text x="282" y="207" font-size="16" font-weight="600" text-anchor="end" fill="#238636">16</text>
+<text x="49" y="225" font-size="12" fill="#57606a">14% of tracked activity</text>
+<circle cx="32" cy="254" r="5" fill="#238636"/>
+<text x="49" y="259" font-size="16" fill="#24292f">Issues</text>
+<text x="282" y="259" font-size="16" font-weight="600" text-anchor="end" fill="#238636">4</text>
+<text x="49" y="277" font-size="12" fill="#57606a">3% of tracked activity</text>
+<circle cx="32" cy="306" r="5" fill="#238636"/>
+<text x="49" y="311" font-size="16" fill="#24292f">Code reviews</text>
+<text x="282" y="311" font-size="16" font-weight="600" text-anchor="end" fill="#238636">13</text>
+<text x="49" y="329" font-size="12" fill="#57606a">11% of tracked activity</text>
+<line x1="475" y1="212" x2="695" y2="212" stroke="#d8dee4" stroke-width="2"/>
+<line x1="585" y1="102" x2="585" y2="322" stroke="#d8dee4" stroke-width="2"/>
+<line x1="557.5" x2="557.5" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="612.5" x2="612.5" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="184.5" y2="184.5" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="239.5" y2="239.5" stroke="#d8dee4"/>
+<line x1="530.0" x2="530.0" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="640.0" x2="640.0" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="157.0" y2="157.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="267.0" y2="267.0" stroke="#d8dee4"/>
+<line x1="502.5" x2="502.5" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="667.5" x2="667.5" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="129.5" y2="129.5" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="294.5" y2="294.5" stroke="#d8dee4"/>
+<line x1="475.0" x2="475.0" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="695.0" x2="695.0" y1="208.0" y2="216.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="102.0" y2="102.0" stroke="#d8dee4"/>
+<line x1="581.0" x2="589.0" y1="322.0" y2="322.0" stroke="#d8dee4"/>
+<polygon points="585.00,199.67 588.79,212.00 585.00,227.17 506.29,212.00" fill="#238636" fill-opacity="0.14" stroke="#238636" stroke-opacity="0.7" stroke-width="1.5"/>
+<line x1="585" y1="212" x2="585.0" y2="199.7" stroke="#238636" stroke-width="5" stroke-linecap="round"/>
+<circle cx="585.0" cy="199.7" r="4.5" fill="#238636"/>
+<line x1="585" y1="212" x2="588.8" y2="212.0" stroke="#238636" stroke-width="5" stroke-linecap="round"/>
+<circle cx="588.8" cy="212.0" r="4.5" fill="#238636"/>
+<line x1="585" y1="212" x2="585.0" y2="227.2" stroke="#238636" stroke-width="5" stroke-linecap="round"/>
+<circle cx="585.0" cy="227.2" r="4.5" fill="#238636"/>
+<line x1="585" y1="212" x2="506.3" y2="212.0" stroke="#238636" stroke-width="5" stroke-linecap="round"/>
+<circle cx="506.3" cy="212.0" r="4.5" fill="#238636"/>
+<circle cx="585" cy="212" r="4" fill="#238636"/>
+<text x="585" y="77" font-size="14" text-anchor="middle" fill="#57606a">11% Code reviews</text>
+<text x="585" y="365" font-size="14" text-anchor="middle" fill="#57606a">14% Pull requests</text>
+<text x="454" y="217" font-size="14" text-anchor="end" fill="#57606a">72% Commits</text>
+<text x="715" y="217" font-size="14" text-anchor="start" fill="#57606a">3% Issues</text>
+<text x="24" y="381" font-size="12" fill="#57606a">Percentages are based on these four tracked contribution types.</text>
+</g>
+</svg>
