@@ -2,7 +2,7 @@ name: Update GitHub Profile Cards
 
 on:
   schedule:
-    # 07:00 (UTC+8); GitHub Actions uses UTC for cron.
+    # 07:00 (UTC+8); GitHub Actions cron uses UTC.
     - cron: '0 23 * * *'
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the profile repository
+      - name: Check out profile repository
         uses: actions/checkout@v4
 
       - name: Generate light cards
@@ -30,6 +30,12 @@ jobs:
           UTC_OFFSET: 8
           AUTO_PUSH: false
 
+      - name: Preserve light cards
+        run: |
+          test -s profile-summary-card-output/github/3-stats.svg
+          mkdir -p "$RUNNER_TEMP/profile-cards"
+          cp -a profile-summary-card-output/github "$RUNNER_TEMP/profile-cards/"
+
       - name: Generate dark cards
         uses: vn7n24fzkq/github-profile-summary-cards@v0.12.0
         env:
@@ -40,11 +46,21 @@ jobs:
           UTC_OFFSET: 8
           AUTO_PUSH: false
 
+      - name: Restore light cards and validate output
+        run: |
+          test -s profile-summary-card-output/github_dark/3-stats.svg
+          cp -a "$RUNNER_TEMP/profile-cards/github" profile-summary-card-output/
+          for theme in github github_dark; do
+            for card in 0-profile-details 1-repos-per-language 2-most-commit-language 3-stats 4-productive-time; do
+              test -s "profile-summary-card-output/$theme/$card.svg" || { echo "Missing $theme/$card.svg"; exit 1; }
+            done
+          done
+
       - name: Commit cards if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add profile-summary-card-output/github/ profile-summary-card-output/github_dark/
+          git add -A profile-summary-card-output/github/ profile-summary-card-output/github_dark/
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh GitHub profile cards [skip ci]"
             git push
