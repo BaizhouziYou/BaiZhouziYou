@@ -37,7 +37,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: stats
-          options: username=BaizhouziYou&theme=default&show_icons=true&hide_rank=true
+          options: username=BaizhouziYou&theme=default&show_icons=true&hide_rank=false&rank_icon=default
           path: profile-assets/stats-light.svg
           token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
           fail_on_error: true
@@ -46,7 +46,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: stats
-          options: username=BaizhouziYou&theme=github_dark&show_icons=true&hide_rank=true
+          options: username=BaizhouziYou&theme=github_dark&show_icons=true&hide_rank=false&rank_icon=default
           path: profile-assets/stats-dark.svg
           token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
           fail_on_error: true
@@ -69,7 +69,7 @@ jobs:
           token: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
           fail_on_error: true
 
-      - name: Generate contribution calendar (light + dark)
+      - name: Generate contribution calendar and activity overview (light + dark)
         env:
           PROFILE_STATS_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
           PROFILE_STATS_USERNAME: BaizhouziYou
@@ -81,7 +81,8 @@ jobs:
           from pathlib import Path
           from xml.etree import ElementTree as ET
           names = ['stats-light', 'stats-dark', 'langs-light', 'langs-dark',
-                   'contributions-light', 'contributions-dark']
+                   'contributions-light', 'contributions-dark',
+                   'activity-light', 'activity-dark']
           for name in names:
               path = Path('profile-assets') / f'{name}.svg'
               if not path.is_file() or path.stat().st_size < 100:
@@ -92,14 +93,35 @@ jobs:
               print(f'OK: {path} ({path.stat().st_size} bytes)')
           PY
 
-      - name: Commit updated SVGs
+      - name: Commit generated assets safely (retry on concurrent updates)
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A profile-assets/*.svg
-          if ! git diff --cached --quiet; then
+
+          # Keep the just-generated images outside the repository while syncing.
+          # This preserves any concurrent README or workflow edits on main.
+          mkdir -p "$RUNNER_TEMP/generated-profile-assets"
+          cp profile-assets/*.svg "$RUNNER_TEMP/generated-profile-assets/"
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p profile-assets
+            cp "$RUNNER_TEMP/generated-profile-assets/"*.svg profile-assets/
+            git add -A -- profile-assets/
+            if git diff --cached --quiet; then
+              echo 'No SVG changes to commit.'
+              exit 0
+            fi
             git commit -m 'chore: refresh GitHub profile SVGs [skip ci]'
-            git push
-          else
-            echo 'No SVG changes to commit.'
-          fi
+            if git push origin HEAD:main; then
+              echo 'Generated SVGs pushed successfully.'
+              exit 0
+            fi
+            echo "Remote main advanced during attempt ${attempt}; retrying."
+            sleep "$((attempt * 2))"
+          done
+          echo '::error::Could not push SVGs after five attempts.'
+          exit 1
