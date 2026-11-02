@@ -68,84 +68,71 @@
 
 ### 🚀 Featured Projects
 
-<!-- Single-column entries avoid cramped 50%-width tables on mobile. -->
-
-#### 🧨 [CreeperBoom](https://github.com/BaizhouziYou/CreeperBoom)
-
-A lightweight Minecraft Fabric mod that lets charged creepers drop player heads and provides configurable explosion behavior.
-
-`Java` · `Fabric` · `Gradle`  
-[Source Code](https://github.com/BaizhouziYou/CreeperBoom) · [Modrinth](https://modrinth.com/mod/creeperboom)
-
-#### 🌐 [Xintinglei Website](https://github.com/BaizhouziYou/xintinglei-website)
-
-A Minecraft community website with a self-hosted server status API, WebSocket checks, and status history tracking.
-
-`JavaScript` · `Node.js` · `SQLite`  
-[Source Code](https://github.com/BaizhouziYou/xintinglei-website)
-
-#### 📚 [Xintinglei Official Docs](https://github.com/BaizhouziYou/XintingleiOfficialDocs)
-
-Official documentation for the Xintinglei Minecraft community, built with VitePress and automated versioned releases.
-
-`VitePress` · `Node.js` · `GitHub Actions`  
-[Source Code](https://github.com/BaizhouziYou/XintingleiOfficialDocs) · [Documentation](https://docs.xintinglei.cn)
-
-#### 🎨 [EasyBot Image Templates](https://github.com/BaizhouziYou/easybot-image-templates)
-
-A collection of EasyBot image templates for server player lists, player statistics, and performance monitoring, with customizable WebGL-inspired visuals.
-
-`HTML` · `CSS` · `JavaScript` · `WebGL`  
-[Source Code](https://github.com/BaizhouziYou/easybot-image-templates)
-
-#### 🥮 [Xintinglei Extras](https://github.com/BaizhouziYou/XintingleiExtras)
-
-A Minecraft Fabric mod featuring 18 drinks and four types of placeable 3D mooncakes, with interactive crafting and decoration mechanics.
-
-`Java` · `Fabric` · `Minecraft`  
-[Source Code](https://github.com/BaizhouziYou/XintingleiExtras)
+<!-- Compact two-column cards. Keep descriptions short for mobile layouts. -->
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <p><strong>🧨 <a href="https://github.com/BaizhouziYou/CreeperBoom">CreeperBoom</a></strong></p>
+      <p>Fabric mod for player-head drops and creeper explosion settings.</p>
+      <p><sub>Java · Fabric</sub></p>
+      <a href="https://modrinth.com/mod/creeperboom">Modrinth</a>
+    </td>
+    <td width="50%" valign="top">
+      <p><strong>🌐 <a href="https://github.com/BaizhouziYou/xintinglei-website">Xintinglei Website</a></strong></p>
+      <p>Community website with server status and history tracking.</p>
+      <p><sub>JavaScript · Node.js · SQLite</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <p><strong>📚 <a href="https://github.com/BaizhouziYou/XintingleiOfficialDocs">Xintinglei Official Docs</a></strong></p>
+      <p>Versioned Minecraft community documentation built with VitePress.</p>
+      <p><sub>VitePress · Node.js</sub></p>
+      <a href="https://docs.xintinglei.cn">Read Docs</a>
+    </td>
+    <td width="50%" valign="top">
+      <p><strong>🎨 <a href="https://github.com/BaizhouziYou/easybot-image-templates">EasyBot Image Templates</a></strong></p>
+      <p>Customizable player, server-status, and performance graphics.</p>
+      <p><sub>HTML · CSS · JavaScript</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top">
+      <p><strong>🥮 <a href="https://github.com/BaizhouziYou/XintingleiExtras">Xintinglei Extras</a></strong></p>
+      <p>Minecraft Fabric mod adding 18 drinks and four varieties of interactive, placeable mooncakes.</p>
+      <p><sub>Java · Fabric · Minecraft</sub></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
 ### 📊 GitHub Stats
 
-<!-- The light and dark SVG cards are generated daily by GitHub Actions. -->
-<!-- Each card is on its own row to stay legible on narrow screens. -->
+<!-- All stats are generated daily by this repository's GitHub Actions. -->
+<!-- Use <picture> to match the visitor's light / dark GitHub theme. -->
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/stats-dark.svg" />
+        <img src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/stats-light.svg" alt="GitHub statistics" width="100%" />
+      </picture>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/langs-dark.svg" />
+        <img src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/langs-light.svg" alt="Most used programming languages" width="100%" />
+      </picture>
+    </td>
+  </tr>
+</table>
+
 <div align="center">
-  <p>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github_dark/0-profile-details.svg" />
-      <img alt="GitHub contribution activity" src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github/0-profile-details.svg" width="100%" />
-    </picture>
-  </p>
-
-  <p>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github_dark/3-stats.svg" />
-      <img alt="GitHub statistics" src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github/3-stats.svg" width="480" />
-    </picture>
-  </p>
-
-  <p>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github_dark/1-repos-per-language.svg" />
-      <img alt="Languages used in repositories" src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github/1-repos-per-language.svg" width="480" />
-    </picture>
-  </p>
-
-  <p>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github_dark/2-most-commit-language.svg" />
-      <img alt="Languages used in commits" src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github/2-most-commit-language.svg" width="480" />
-    </picture>
-  </p>
-
-  <p>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github_dark/4-productive-time.svg" />
-      <img alt="Productive time distribution" src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-summary-card-output/github/4-productive-time.svg" width="480" />
-    </picture>
-  </p>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/contributions-dark.svg" />
+    <img src="https://raw.githubusercontent.com/BaizhouziYou/BaiZhouziYou/main/profile-assets/contributions-light.svg" alt="GitHub contributions heatmap" width="100%" />
+  </picture>
 </div>
 
 ---
